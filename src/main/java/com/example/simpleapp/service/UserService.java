@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 @Service
@@ -25,28 +27,12 @@ public class UserService {
         final String OLD_FORMAT = "yyyy-MM-dd";
         final String NEW_FORMAT = "dd-MM-yyyy";
 
-        UserInfo temp = userRepository.getUser(username);
+        UserInfo user = userRepository.getUser(username);
+        String datePlusOneDay=addOneDay(user.getDate_of_birth().toString());
+        Date newDate=new SimpleDateFormat("yyyy-MM-dd").parse(datePlusOneDay);
+        user.setDate_of_birth(newDate);
 
-        SimpleDateFormat sdf = new SimpleDateFormat(OLD_FORMAT);
-        System.out.println("date = "+temp.getDate_of_birth().toString());
-        String[] date=temp.getDate_of_birth().toString().split("-");
-        System.out.println("date[] = "+date.toString());
-        String dateStringFormatted=date[2]+"-"+date[1]+"-"+date[0];
-        System.out.println("date formatted = "+dateStringFormatted);
-        Date date1=new SimpleDateFormat("dd-MM-yyyy").parse(dateStringFormatted);
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        Date inputDate = dateFormat.parse(dateStringFormatted);
-        temp.setDate_of_birth(date1);
-
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-
-        Date startDate;
-        startDate = df.parse(dateStringFormatted);
-        String newDateString = df.format(startDate);
-        System.out.println(newDateString);
-
-
-        return temp;
+        return user;
     }
     public Float getUsersOrdersPrice(List<Integer> list,String username) throws ParseException, JsonProcessingException {
         List<BookInfo> order = userRepository.orderBook(list,username);
@@ -61,9 +47,8 @@ public class UserService {
         return new Boolean(true);
     }
 
-    public int addUser(JSONObject json) throws Exception {
+    public void addUser(JSONObject json) throws Exception {
         userRepository.addUser(json);
-        return 1;
     }
     public List<BookInfo> getRecommendedBook() throws JsonProcessingException, HandledException {
         return userRepository.getRecommendedBook();
@@ -76,5 +61,8 @@ public class UserService {
         String[] usernameandpassword = usernamepassword.split(":");
         String username = usernameandpassword[0];
         return username;
+    }
+    static public String addOneDay(String date) {
+        return LocalDate.parse(date).plusDays(1).toString();
     }
 }

@@ -78,8 +78,9 @@ public class UserController {
 
     }
     @PostMapping(path = "users")//dont need authen
-    public ResponseEntity<Integer> postUser(@RequestBody JSONObject json) throws Exception {
-        return new ResponseEntity<Integer>(userService.addUser(json), HttpStatus.OK);
+    public HttpStatus postUser(@RequestBody JSONObject json) throws Exception {
+        userService.addUser(json);
+        return HttpStatus.OK;
     }
 
     @GetMapping(path = "books")//no need authen

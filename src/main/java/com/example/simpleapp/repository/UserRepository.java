@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Repository
@@ -22,8 +23,6 @@ public class UserRepository {
     private static List<User> loggedInUser = new ArrayList<>();
     @Autowired
     JdbcTemplate jdbcTemplate;
-
-
 
     public UserRepository() {
 
@@ -49,7 +48,6 @@ public class UserRepository {
         result.setName(user.getName());
         result.setSurname(user.getSurname());
         result.setDate_of_birth(user.getDate_of_birth());
-
 
         result.setBooks(new ArrayList<Integer>());
         for(int i = 0;i<order.size();i++){
@@ -106,7 +104,6 @@ public class UserRepository {
             }
         }
         return result_Book_List;
-
     }
 
     public boolean deleteOrder(String username){
@@ -139,15 +136,8 @@ public class UserRepository {
         String sql;
 
         //add useraccount to database,auto increase id in database
-        /*Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(date_of_birth);
-        date1= new SimpleDateFormat("yyyy-MM-dd").parse(date1.toString());
-        System.out.println("date = "+ date1);*/
         String[] datearray= date_of_birth.split("/");
-        System.out.println(datearray.toString());
         date_of_birth=datearray[2]+"-"+datearray[1]+"-"+datearray[0];
-
-        System.out.println(date_of_birth);
-
         try {
             sql = "INSERT INTO jet_schema.user(username, password, date_of_birth,name,surname)  " +
                     "VALUES (\"" + username + "\",\"" + password + "\",\"" + date_of_birth +"\",\""+name +"\",\"" +surname+ "\")";
@@ -156,8 +146,6 @@ public class UserRepository {
         catch (Exception e){
             throw new HandledException("Fail to update user because the username is exists");
         }
-        // retrieve id that auto increase from database
-
     }
     public List<BookInfo> getRecommendedBook()
             throws JsonProcessingException, HandledException {
@@ -216,7 +204,7 @@ public class UserRepository {
                 return u1.getBook_name().compareTo(u2.getBook_name());
             }
         });
-        System.out.println("result_Recommended = "+result_Recommended.toString());
+
         //sort result_Non_Recommended by aphabet
         Collections.sort(result_Non_Recommended, new Comparator<BookInfo>(){
             @Override
@@ -224,7 +212,7 @@ public class UserRepository {
                 return u1.getBook_name().compareTo(u2.getBook_name());
             }
         });
-        System.out.println("result_Non_Recommended = "+result_Non_Recommended.toString());
+
         //
         for(int i = 0;i<result_Non_Recommended.size();i++){
             result_Recommended.add(result_Non_Recommended.get(i));
