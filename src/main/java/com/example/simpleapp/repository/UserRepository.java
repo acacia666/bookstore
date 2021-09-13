@@ -73,7 +73,7 @@ public class UserRepository {
                 id=loggedInUser.get(i).getId();
             }
         }
-        System.out.println("id = "+Integer.toString(id));
+        //System.out.println("id = "+Integer.toString(id));
 
         //retrieve string of json list from external api
         String uri = "https://scb-test-book-publisher.herokuapp.com/books";
@@ -98,7 +98,7 @@ public class UserRepository {
                     float price=bookList.get(j).getPrice();
                         String sql ="INSERT INTO jet_schema.order (user_id, book_id, price) " +
                             "VALUES ("+user_id+","+book_id+","+ price+")";
-                        System.out.println("sql = "+sql);
+
                     jdbcTemplate.update(sql);
                 }
             }
@@ -189,7 +189,7 @@ public class UserRepository {
         List<BookInfo> result_Non_Recommended= new ArrayList<>();
         for(int i =0;i<bookList.size();i++){
             if(bookList.get(i).getIs_recommended().equals(new Boolean(true))){
-                System.out.println("bobo");
+
                 result_Recommended.add(bookList.get(i));
             }
             else{
@@ -250,10 +250,22 @@ public class UserRepository {
         }
     }
 
-    public boolean checkLoggedInUser(String username){
+
+    public boolean checkLoggedInUser(String token){
+        String usernamepassword = token.substring(6, token.length());
+        byte[] decodedBytes = Base64.getDecoder().decode(usernamepassword);
+        usernamepassword = new String(decodedBytes);
+        String[] usernameandpassword = usernamepassword.split(":");
+        String username = usernameandpassword[0];
+
+
+        String password = usernameandpassword[1];
+
         boolean logIn=false;
         for(int i = 0;i<loggedInUser.size();i++){
-            if(loggedInUser.get(i).getUsername().equals(username)){
+            byte[] decoded = Base64.getDecoder().decode(loggedInUser.get(i).getPassword());
+            String decodedpassword = new String(decoded);
+            if(loggedInUser.get(i).getUsername().equals(username) && decodedpassword.equals(password)){
                 logIn=true;
             }
         }

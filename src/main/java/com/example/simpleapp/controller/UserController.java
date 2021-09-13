@@ -46,8 +46,9 @@ public class UserController {
     public ResponseEntity<UserInfo> getUser(@RequestHeader(name = "Authorization") String token)
             throws java.text.ParseException {
         String username = userService.getUserFromToken(token);
-        boolean auth = userRepository.checkLoggedInUser(username);
+        boolean auth = userRepository.checkLoggedInUser(token);
         if(auth==true) {
+            //System.out.println("bobo");
             return new ResponseEntity<UserInfo>(userService.getCurrentUser(username), HttpStatus.OK);
         }
         else {
@@ -56,20 +57,21 @@ public class UserController {
     }
 
     @DeleteMapping(path = "users")//need authen
-    public ResponseEntity<Boolean> deleteUserOrder(@RequestHeader(name = "Authorization") String token) {
+    public HttpStatus deleteUserOrder(@RequestHeader(name = "Authorization") String token) {
         String username = userService.getUserFromToken(token);
-        boolean auth = userRepository.checkLoggedInUser(username);
+        boolean auth = userRepository.checkLoggedInUser(token);
         if (auth == false) {
             return null;
         } else {
-            return new ResponseEntity<Boolean>(userService.deleteUser(username), HttpStatus.OK);
+            userService.deleteUser(username);
+            return HttpStatus.OK;
         }
     }
 
     @PostMapping(path = "users/orders")//need authen
     public ResponseEntity<Price> postUserOrder(@RequestBody Map<String, List<Integer>> payload, @RequestHeader(name = "Authorization") String token) throws ParseException, JsonProcessingException {
         String username = userService.getUserFromToken(token);
-        boolean auth = userRepository.checkLoggedInUser(username);
+        boolean auth = userRepository.checkLoggedInUser(token);
         if (auth == false) {
             return null;
         } else {
